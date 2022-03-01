@@ -9,15 +9,15 @@ object BloomGen {
   def main(args: Array[String]): Unit = {
 
     val numKeys = 50_000
-    val falsePositives = 0.0001
-    val bloom: BloomFilter[String] = BloomFilter.create(StringFunnel, numKeys, falsePositives)
+    val falsePositives = 0.0000001
+    val bloom = BloomFilter.create[String](StringFunnel, numKeys, falsePositives)
 
-    Using(new BufferedReader(new FileReader("keys.txt"))) { reader =>
-      Iterator.continually(reader.readLine()).takeWhile(_ != null).foreach(bloom.put)
+    Using(new BufferedReader(new FileReader("test.txt"))) { reader =>
+      Iterator.continually(reader.readLine()).take(numKeys).takeWhile(_ != null).foreach(bloom.put)
     }
 
-    Using(new FileOutputStream("bloom.bin")) { out =>
-      bloom.writeTo(out)
+    Using(new FileOutputStream("bloom.bin")) { fout =>
+      bloom.writeTo(fout)
     }
 
     println(s"approximateElementCount = ${bloom.approximateElementCount()}")
